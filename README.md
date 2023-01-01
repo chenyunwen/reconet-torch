@@ -1,7 +1,7 @@
 # reconet-torch
 
 ## What we did?
-1. Fix some problems, such as automatically read the fps of the video and change the output video format.
+1. Improve some functions, such as automatically read the fps of the video and change the output video format.
 2. Calculate execution time.
 
 ## How to use?
