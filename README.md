@@ -19,7 +19,7 @@ python train.py --phase train --path mpidataset --style-name=style_images/Under-
 ```
 #### Testing
 
-We trained three models, respectively in the following folders:
+We trained four models, respectively in the following folders:
 
 `trained_models_the-muse/`, `trained_models_wave/`, `trained_models_night/`, `trained_models_Arles/`
 
