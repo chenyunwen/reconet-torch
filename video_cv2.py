@@ -7,47 +7,98 @@ import torch
 import numpy as np
 from network import ReCoNet
 import sys
+import imageio
 
 
 def video(path, path_img, device, output_dir='output.avi', fps=30, model=None, concat=False):
-    im_dir = os.path.join(path, path_img)
-    video_dir = os.path.join(path, output_dir)
-    # fps = 30
-    imgs_name = os.listdir(im_dir)
-    imgs_name.sort()
-    num = len(imgs_name)
-    img = cv2.imread(os.path.join(im_dir, imgs_name[0]))
-    h, w, _ = img.shape
-    img_size = (w, h)
-    if concat:
-        img_size = (w, h * 2)
 
-    fourcc = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
-    video_writer = cv2.VideoWriter(video_dir, fourcc, fps, img_size)
-
+    # load video
+    input_video = cv2.VideoCapture(path_img)
+    video_dir = output_dir # os.path.join(path, output_dir)
     start_time = datetime.datetime.now()
-    print('start time:', start_time.strftime('%Y/%m/%d %H:%M:%S'))
-    for i in range(len(imgs_name)):
-        img_dir = os.path.join(im_dir, imgs_name[i])
-        print(img_dir)
-        frame = cv2.imread(img_dir)
-        if model is not None:
-            frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-            img = torch.from_numpy(frame.astype('float32') / 255.0).permute(2, 0, 1)
-            img = img.to(device)
-            _, output = model(img.unsqueeze(0))
-            concat_img = output.squeeze(0).permute(1, 2, 0)
-            if concat:
-                concat_img = torch.cat([img, output.squeeze(0)], dim=1).permute(1, 2, 0)
-            concat_cv2 = concat_img.detach().cpu().numpy()
 
-            frame = concat_cv2 * 255
-            frame = frame.astype('uint8')
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    # Check if video opened successfully
+    if not input_video.isOpened():
+        print("Error opening video stream or file")
+    
+    else:
+        framecount = 0
 
-        video_writer.write(frame)
+        if output_dir is not None:
+            print("output video is not None")
+            frame_width = int(input_video.get(3))
+            frame_height = int(input_video.get(4))
+            video = imageio.get_reader(path_img)
+            fps = video.get_meta_data()['fps']
+            print("fps = ", fps)
+            out = cv2.VideoWriter(video_dir,cv2.VideoWriter_fourcc('M','J','P','G'), fps, (frame_width,frame_height))
+        start_time = datetime.datetime.now()
+        print("start ", start_time.strftime('%Y/%m/%d %H:%M:%S'))
+        while input_video.isOpened():
+            ret, frame = input_video.read()
+            if ret:
+                framecount += 1
+                if model is not None:
+                    frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)                   
+                    img = torch.from_numpy(frame.astype('float32') / 255.0).permute(2, 0, 1)
+                    img = img.to(device)
+                    _, output = model(img.unsqueeze(0))
+                    concat_img = output.squeeze(0).permute(1, 2, 0)
+                    if concat:
+                        concat_img = torch.cat([img, output.squeeze(0)], dim=1).permute(1, 2, 0)
+                    concat_cv2 = concat_img.detach().cpu().numpy()
 
-    video_writer.release()
+                    frame = concat_cv2 * 255
+                    frame = frame.astype('uint8')
+                    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    # print("framecount: ", framecount)
+                    # cv2.imshow('Press Q to exit', frame)
+                    out.write(frame)
+            else:
+                break
+        input_video.release()
+        if output_dir is not None:
+            out.release()
+        cv2.destroyAllWindows()
+
+    # im_dir = os.path.join(path, path_img)
+    # video_dir = os.path.join(path, output_dir)
+    # # fps = 30
+    # imgs_name = os.listdir(im_dir)
+    # imgs_name.sort()
+    # num = len(imgs_name)
+    # img = cv2.imread(os.path.join(im_dir, imgs_name[0]))
+    # h, w, _ = img.shape
+    # img_size = (w, h)
+    # if concat:
+    #     img_size = (w, h * 2)
+
+    # fourcc = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
+    # video_writer = cv2.VideoWriter(video_dir, fourcc, fps, img_size)
+
+    # start_time = datetime.datetime.now()
+    # print('start time:', start_time.strftime('%Y/%m/%d %H:%M:%S'))
+    # for i in range(len(imgs_name)):
+    #     img_dir = os.path.join(im_dir, imgs_name[i])
+    #     print(img_dir)
+    #     frame = cv2.imread(img_dir)
+    #     if model is not None:
+    #         frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+    #         img = torch.from_numpy(frame.astype('float32') / 255.0).permute(2, 0, 1)
+    #         img = img.to(device)
+    #         _, output = model(img.unsqueeze(0))
+    #         concat_img = output.squeeze(0).permute(1, 2, 0)
+    #         if concat:
+    #             concat_img = torch.cat([img, output.squeeze(0)], dim=1).permute(1, 2, 0)
+    #         concat_cv2 = concat_img.detach().cpu().numpy()
+
+    #         frame = concat_cv2 * 255
+    #         frame = frame.astype('uint8')
+    #         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+    #     video_writer.write(frame)
+
+    # video_writer.release()
     end_time = datetime.datetime.now()
     print('end time:', end_time.strftime('%Y/%m/%d %H:%M:%S'))
     print('cost time:', end_time - start_time)
