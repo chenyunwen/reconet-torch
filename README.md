@@ -1,4 +1,44 @@
 # reconet-torch
+
+## What we did?
+1. Modified to do video style transfer.
+2. Calculate execution time.
+
+## How to use?
+
+Environment we used:
+- [Python 3.10.8]
+- [PyTorch 1.13.1]
+
+### Run this code:
+
+#### Training
+Example for training with style image `style_images/Under-the-Wave-off-Kanagawa.jpg`:
+```
+python train.py --phase train --path mpidataset --style-name=style_images/Under-the-Wave-off-Kanagawa.jpg
+```
+#### Testing
+
+We trained three models, respectively in the following folders:
+`trained_models_the-muse/`, `trained_models_wave/`, `trained_models_night/`, `trained_models_Arles/`
+
+Example for testing with style **the-muse** with the input video `content/video_0.mp4`:
+```
+python video_cv2.py --video-name output/ReCoNet_the-muse_video_0.mp4 --mode video_style --save-directory trained_models\ the-muse/ --model-name train.pt --imgs-path content/video_0.mp4
+```
+
+## Our result
+
+- input styles
+
+<img src ="style_images\the-muse.jpg" height="128px" /> <img src ="style_images\Under-the-Wave-off-Kanagawa.jpg" height="128px" /> <img src ="style_images\starry_night.jpg" height="128px" /> <img src ="style_images\Arles.jpg" height="128px" />
+
+---
+
+## The following content comes from the original Repository.
+
+Reference repository: https://github.com/liulai/reconet-torch
+
 This repository contains a PyTorch implementation of the [ReCoNet paper](https://arxiv.org/pdf/1807.01197.pdf). It use a lot of code from [safwankdb](https://github.com/safwankdb/ReCoNet-PyTorch)
 
 ### Contributors:
