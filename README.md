@@ -20,6 +20,7 @@ python train.py --phase train --path mpidataset --style-name=style_images/Under-
 #### Testing
 
 We trained three models, respectively in the following folders:
+
 `trained_models_the-muse/`, `trained_models_wave/`, `trained_models_night/`, `trained_models_Arles/`
 
 Example for testing with style **the-muse** with the input video `content/video_0.mp4`:
@@ -31,7 +32,7 @@ python video_cv2.py --video-name output/ReCoNet_the-muse_video_0.mp4 --mode vide
 
 - input styles
 
-<img src ="style_images\the-muse.jpg" height="128px" /> <img src ="style_images\Under-the-Wave-off-Kanagawa.jpg" height="128px" /> <img src ="style_images\starry_night.jpg" height="128px" /> <img src ="style_images\Arles.jpg" height="128px" />
+<img src ="style_images\the-muse.jpg" height="128px" /> <img src ="style_images\Under-the-Wave-off-Kanagawa.jpg" height="128px" /> <img src ="style_images\starry-night.jpg" height="128px" /> <img src ="style_images\Arles.jpg" height="128px" />
 
 ---
 
